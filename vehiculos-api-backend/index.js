@@ -50,6 +50,7 @@ app.use(errorHandler);
 
 // --- Iniciar Servidor ---
 // Se añade '0.0.0.0' para que Railway pueda asignar el tráfico correctamente
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log('-------------------------------------------');
   console.log(`Servidor iniciado correctamente`);
