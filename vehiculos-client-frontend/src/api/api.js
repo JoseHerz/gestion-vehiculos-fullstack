@@ -1,10 +1,19 @@
 import axios from 'axios';
 
-// Definición de la URL base
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+// URL por defecto para producción (Railway)
+const RAILWAY_API_URL = 'https://backend-vehiculos-ppf-production.up.railway.app/api';
 
-// Este log te permitirá ver en la consola del navegador (F12) 
-// si el frontend está usando la URL de Railway o el localhost.
+// En desarrollo local, debemos apuntar al backend local (cuando exista)
+const LOCAL_API_URL = 'http://localhost:3001/api';
+
+// Definimos la URL base usando:
+// 1) la variable de entorno VITE_API_URL si está definida
+// 2) en modo desarrollo, LOCAL_API_URL
+// 3) en modo producción, RAILWAY_API_URL
+const BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? LOCAL_API_URL : RAILWAY_API_URL);
+
+// Este log te permitirá ver en la consola del navegador (F12)
+// qué URL se está usando para las peticiones.
 console.log("Conectando con la API en:", BASE_URL);
 
 const api = axios.create({
