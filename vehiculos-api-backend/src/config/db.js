@@ -1,24 +1,25 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// Configuración técnica para Railway
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-  // Configuración necesaria para bases de datos en la nube (Render/Railway)
+  // Se prioriza la cadena de conexión completa proporcionada por la plataforma
+  connectionString: process.env.DATABASE_URL,
+  
+  // Configuración de seguridad SSL obligatoria para entornos en la nube
   ssl: {
     rejectUnauthorized: false
   }
 });
 
-// Verificación de conexión
+// Verificación de integridad de la conexión
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
-    console.error('Error conectando a la base de datos:', err.stack);
+    console.error('--- FALLO DE CONEXIÓN A BASE DE DATOS ---');
+    console.error('Detalle técnico:', err.message);
+    console.error('-----------------------------------------');
   } else {
-    console.log('Conexión a PostgreSQL exitosa');
+    console.log('>>> Conexión exitosa a PostgreSQL en Railway');
   }
 });
 

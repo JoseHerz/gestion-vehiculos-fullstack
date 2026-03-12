@@ -13,14 +13,16 @@ const getUsuarios = async (req, res) => {
     }
 };
 
-// 2. Registrar nuevo usuario (Exclusivo para ADMIN en el frontend)
+// 2. Registrar nuevo usuario
 const register = async (req, res) => {
     const { nombre, username, password, rol } = req.body;
     try {
+        // Encriptación de la contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
+        
         const { rows } = await db.query(
             'INSERT INTO usuarios (nombre, username, password, rol) VALUES ($1, $2, $3, $4) RETURNING id, username',
-            [nombre, username, hashedPassword, rol || 'user']
+            [nombre, username, hashedPassword, (rol || 'USER').toUpperCase()]
         );
         res.status(201).json({ mensaje: 'Usuario creado con éxito', usuario: rows[0] });
     } catch (error) {
@@ -48,7 +50,7 @@ const actualizarUsuario = async (req, res) => {
     try {
         await db.query(
             'UPDATE usuarios SET nombre = $1, username = $2, rol = $3 WHERE id = $4',
-            [nombre, username, rol, id]
+            [nombre, username, (rol || 'USER').toUpperCase(), id]
         );
         res.json({ mensaje: 'Usuario actualizado correctamente' });
     } catch (error) {
@@ -61,14 +63,23 @@ const actualizarUsuario = async (req, res) => {
 const login = async (req, res) => {
     const { username, password } = req.body;
     try {
+        // Buscamos al usuario por su identificador único
         const { rows } = await db.query('SELECT * FROM usuarios WHERE username = $1', [username]);
-        if (rows.length === 0) return res.status(401).json({ mensaje: 'Credenciales inválidas' });
+        
+        if (rows.length === 0) {
+            return res.status(401).json({ mensaje: 'Credenciales inválidas' });
+        }
 
         const usuario = rows[0];
+        
+        // Comparación del hash (importante el trim si el campo en DB es CHAR)
         const validPassword = await bcrypt.compare(password, usuario.password.trim());
         
-        if (!validPassword) return res.status(401).json({ mensaje: 'Credenciales inválidas' });
+        if (!validPassword) {
+            return res.status(401).json({ mensaje: 'Credenciales inválidas' });
+        }
 
+        // Generación del JSON Web Token
         const token = jwt.sign(
             { id: usuario.id, username: usuario.username, rol: usuario.rol },
             process.env.JWT_SECRET || 'clave_maestra_secreta',
@@ -81,10 +92,11 @@ const login = async (req, res) => {
                 id: usuario.id,
                 username: usuario.username,
                 nombre: usuario.nombre,
-                rol: usuario.rol // Fundamental para controlar la visibilidad del botón en React
+                rol: (usuario.rol || 'USER').toUpperCase() 
             }
         });
     } catch (error) {
+        console.error("ERROR EN LOGIN:", error);
         res.status(500).json({ mensaje: 'Error interno del servidor' });
     }
 };

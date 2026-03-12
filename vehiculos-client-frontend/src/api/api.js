@@ -1,16 +1,17 @@
 import axios from 'axios';
 
-// Variable de entorno protegida
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL 
+    baseURL: BASE_URL,
+    timeout: 10000 // 10 segundos de espera máxima
 });
 
-// Interceptor para añadir el token en cada petición
+// Inyección de Seguridad
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
         if (token) {
-            // Estándar Bearer Token para seguridad en el Backend
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
@@ -20,18 +21,26 @@ api.interceptors.request.use(
     }
 );
 
-// Interceptor para manejar errores globales (como token expirado)
+// Interceptor de Respuestas
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        // Si el servidor responde 401 (No autorizado), limpiamos sesión
+        // 1. Error de Conexión (El servidor no responde o URL incorrecta)
+        if (!error.response) {
+            console.error("CRÍTICO: No hay respuesta del servidor.");
+            console.error("Intentando conectar a:", BASE_URL);
+            console.error("Verifica si el Backend en Railway está encendido.");
+        }
+
+        // 2. Sesión Expirada o No Autorizada (401)
         if (error.response && error.response.status === 401) {
+            console.warn("Sesión inválida o expirada. Redirigiendo...");
             localStorage.clear();
-            // Redirigimos al login de forma segura
             if (window.location.pathname !== '/login') {
                 window.location.href = '/login';
             }
         }
+
         return Promise.reject(error);
     }
 );
