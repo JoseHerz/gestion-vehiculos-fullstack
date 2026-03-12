@@ -1,22 +1,40 @@
+/* eslint-disable no-undef */
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  
+  // Configuración para que Railway pueda acceder al sitio
+  server: {
+    host: true,
+    port: process.env.PORT ? parseInt(process.env.PORT) : 8080,
+    allowedHosts: true
+  },
+  
+  // Configuración para el modo preview en la nube
+  preview: {
+    host: true,
+    port: process.env.PORT ? parseInt(process.env.PORT) : 8080,
+    allowedHosts: true
+  },
+
   build: {
-    // 1. Desactiva los mapas de código para producción para proteger el código fuente
+    // 1. Desactiva mapas de código para proteger tu lógica
     sourcemap: false,
-    // 2. Asegura que el código se compacte y se eliminen los console.log para dificultar el rastreo y mejorar la seguridad
+    
+    // 2. Minificación agresiva con Terser
     minify: 'terser',
     terserOptions: {
       compress: {
-        // Elimina todos los console.log en producción para mayor limpieza y seguridad
+        // Elimina console.logs y debuggers en producción
         drop_console: true,
         drop_debugger: true,
       },
     },
-    // 3. Divide el código en trozos más pequeños para mejorar la carga y dificultar el rastreo
+    
+    // 3. Optimización de fragmentos
     rollupOptions: {
       output: {
         manualChunks: undefined,
