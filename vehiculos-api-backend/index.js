@@ -12,7 +12,7 @@ const usuarioRoutes = require('./src/routes/usuarioRoutes');
 const errorHandler = require('./src/middlewares/errorHandler');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 
 // --- Middlewares Globales ---
 // Ajuste de CORS para permitir cabeceras de autenticación en producción
