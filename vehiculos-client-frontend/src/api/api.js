@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Definición de la URL base
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 // Este log te permitirá ver en la consola del navegador (F12) 
 // si el frontend está usando la URL de Railway o el localhost.
