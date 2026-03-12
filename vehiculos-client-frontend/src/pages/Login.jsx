@@ -114,6 +114,7 @@ const Login = () => {
                                     fontSize: '14px',
                                     color: '#4b5563'
                                 }}
+                                inputProps={{ autoComplete: 'current-password' }}
                                 placeholder="Contraseña"
                                 required 
                             />

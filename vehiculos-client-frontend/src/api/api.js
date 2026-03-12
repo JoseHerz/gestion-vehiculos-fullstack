@@ -3,14 +3,10 @@ import axios from 'axios';
 // URL por defecto para producción (Railway)
 const RAILWAY_API_URL = 'https://backend-vehiculos-ppf-production.up.railway.app/api';
 
-// En desarrollo local, debemos apuntar al backend local (cuando exista)
-const LOCAL_API_URL = 'http://localhost:3001/api';
-
-// Definimos la URL base usando:
-// 1) la variable de entorno VITE_API_URL si está definida
-// 2) en modo desarrollo, LOCAL_API_URL
-// 3) en modo producción, RAILWAY_API_URL
-const BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? LOCAL_API_URL : RAILWAY_API_URL);
+// Si necesitas apuntar a un backend local, define VITE_API_URL en tu .env:
+// VITE_API_URL=http://localhost:3001/api
+// En producción (o cuando no se define VITE_API_URL), usamos el backend de Railway.
+const BASE_URL = import.meta.env.VITE_API_URL || RAILWAY_API_URL;
 
 // Este log te permitirá ver en la consola del navegador (F12)
 // qué URL se está usando para las peticiones.
